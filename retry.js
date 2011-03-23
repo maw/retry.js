@@ -20,7 +20,7 @@
     var do_nothing = function () { };
     
     var defaults = {
-        interval: 10, // ms
+        interval: 100, // ms
         quadratic: true,
         attempts: 4,
         gave_up: do_nothing
@@ -59,6 +59,7 @@
         log(inspect(self.opts));
         
         self.go = function (func) {
+            self.opts.interval = defaults.interval;
             self.func = func;
             self.func();
         };
