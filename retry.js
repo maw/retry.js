@@ -2,22 +2,23 @@
     
     var Retry;
     var log, debug, inspect;
+    var do_nothing = function () { };
+    
     if (typeof exports !== 'undefined') {
         Retry = exports;
-        log = require("util").log;
-        debug = require("util").debug;
-        inspect = require("util").inspect;
+        log = debug = inspect = do_nothing;
+        /* log = require("util").log;
+           debug = require("util").debug;
+           inspect = require("util").inspect; */
     } else {
         this.Retry = Retry = {};
-        log = inspect = function () {};
-        debug = function (str) {
-            $("#debug2").append("<br />" + str);
-        };
-    }
+        log = inspect = debug = do_nothing;
+        /* debug = function (str) {
+           $("#debug2").append("<br />" + str);
+           }; */
+    } 
     
     debug("...");
-    
-    var do_nothing = function () { };
     
     var defaults = {
         interval: 100, // ms
@@ -55,8 +56,6 @@
         var self = this;
         self.func = null;
         self.opts = populate(options);
-        
-        log(inspect(self.opts));
         
         self.go = function (func) {
             self.opts.interval = defaults.interval;
