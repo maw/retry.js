@@ -1,17 +1,52 @@
 (function () {
-    var log = require("util").log,
+    
+    var Retry;
+    var log, debug, inspect;
+    if (typeof exports !== 'undefined') {
+        Retry = exports;
+        log = require("util").log;
         debug = require("util").debug;
+        inspect = require("util").inspect;
+    } else {
+        this.Retry = Retry = {};
+        log = inspect = function () {};
+        debug = function (str) {
+            $("#debug2").append("<br />" + str);
+        };
+    }
+    
+    debug("...");
+    
+    var RetryError = function (message, code) {
+        this.message = message;
+        this.code = code;
+        return this;
+    };
+
+    RetryError.prototype.toString = function () {
+        return "RetryError";
+    };
+    
+    RetryError.prototype.tacos = function () {
+        return this.message;
+    };
+    
+    var RetryGaveUp = function () {
+        this.message = "retry has given up";
+        this.toString = function () {
+            return "RetryGaveUp";
+        };
+        return this;
+    };
+    
+    var do_nothing = function () { };
     
     var defaults = {
-        interval: 100, // ms
+        interval: 10, // ms
         quadratic: true,
         attempts: 4,
-        RetryGaveUp: function () {
-            this.message = "retry has given up";
-            this.toString = function () {
-                return "RetryGaveUp";
-            };
-        }
+        success: do_nothing,
+        gave_up: do_nothing
     };
     
     var populate = function (opts) {
@@ -32,58 +67,49 @@
             retval.attempts = defaults.attempts;
         }
         
-        if (opts.RetryGaveUp === undefined) {
-            retval.RetryGaveUp = defaults.RetryGaveUp();
+        if (opts.success === undefined) {
+            retval.success = do_nothing;
+        }
+        
+        if (opts.gave_up === undefined) {
+            retval.gave_up = do_nothing;
         }
         
         return retval;
     };
     
-    var RetryError = function (message, code) {
-        this.message = message;
-        this.code = code;
-        return this;
-    };
-
-    RetryError.prototype.toString = function () {
-        return "RetryError";
-    };
-    
-    RetryError.prototype.tacos = function () {
-        return this.message;
-    };
-    
-    var retry = function (func, options) {
-        var opts = populate(options);
+    // var Retryer = function (func, options) {
+    var Retryer = function (options) {
+        var self = this;
+        self.func = null;
+        self.opts = populate(options);
         
-        var retrier = function () {
-            try {
-                func();
-                
-            } catch (e) {
-                if (e.toString() === "RetryError") {
-                    debug("caught a RetryError; might try again.");
-                    if (opts.attempts > 0) {
-                        debug("will retry again in " + opts.interval + "ms");
-                        setTimeout(retrier, opts.interval);
-                    } else {
-                        debug("won't try again; will throw exception");
-                        throw new opts.RetryGaveUp();
-                    }
-                    opts.attempts--;
-                    if (opts.quadratic === true) {
-                        opts.interval *= 2;
-                    }
-                } else {
-                    throw e;
+        log(inspect(self.opts));
+        
+        self.go = function (func) {
+            self.func = func;
+            self.func();
+        };
+        
+        self.retry = function () {
+            if (self.opts.attempts > 0) {
+                debug("will retry again in " + self.opts.interval + "ms");
+                setTimeout(self.func, self.opts.interval);
+                self.opts.attempts--;
+                if (self.opts.quadratic === true) {
+                    self.opts.interval *= 2;
                 }
+            } else {
+                self.opts.gave_up();
             }
         };
-        retrier();
+        
+        // self.func();
+        
+        return self;
     };
     
-    
-    exports.retry = retry;
-    exports.RetryError = RetryError;
-    
+    Retry.Retryer = Retryer;
+    Retry.RetryError = RetryError;
+    Retry.RetryGaveUp = RetryGaveUp;    
 })();
