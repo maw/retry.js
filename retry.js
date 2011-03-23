@@ -34,8 +34,6 @@
         var retval = opts;
         if (opts.interval === undefined) {
             retval.interval = defaults.interval;
-        } else {
-            debug("using interval of " + opts.interval);
         }
         
         if (opts.quadratic === undefined) {
