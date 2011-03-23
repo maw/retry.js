@@ -1,12 +1,13 @@
 retry.js - (relatively) easy to use retrying with quadratic backoff
 
 Whys and hows:
+=============
 
 Maybe you're querying your database from node, or perhaps you're trying to
 make an ajax call from the browser.  You encapsulate this into a function,
 because you expect to make your query or call more than once.
 
-So, you have a function you'll wish to retry.
+So, you have a function you'll wish to retry:
 
     var count = 0;
     var will_fail_intermittently = function () {
@@ -18,7 +19,7 @@ So, you have a function you'll wish to retry.
     };
 
 And you'd like to bail out after some reasonable number of attempts have
-been made ...
+been made:
 
     var count = 0;
     var will_fail_intermittently = function () {
@@ -56,7 +57,7 @@ node, but retry.js works equally well on the browser.
 
 And there you go.  This interface isn't ideal, to be sure (patches or
 suggestions for improvement are, of course, welcome), but it works, and it
-beats having to rewrite the logic over and over.
+beats having to rewrite retrying logic with quadratic backoff over and over.
 
 The Retryer constructor takes a single options argument, with the following
 defaults.
@@ -69,10 +70,10 @@ defaults.
     };
 
 I think these defaults are reasonable.  If not, they're easy enough to
-override.  In many cases, you'll only want to provide your own ``give_up``.
+override.  In many cases, you'll only need to provide your own ``give_up``.
 
 
-Problems
+Problems:
 ========
 
 * You need to create a new Retryer instance for each function you wish to
