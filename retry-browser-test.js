@@ -42,9 +42,6 @@ retryer = new retry.Retryer({gave_up: gave_up});
 
 retryer.go(will_fail1);
 
-
-//retryer.go(will_fail1);
-
 var retryer2,
     gave_up2 = function () {
         debug("ajax giving up");
@@ -53,23 +50,14 @@ var ajax_will_fail = function () {
     $.ajax({url: "/doesnotexist",
             success: function (data, status) {
                 // just fake failure
-                if (data === null) {
-                    alert("data is null");
-                } else if (data === undefined) {
-                    alert("data is undefined");
-                } else if (data === "") {
-                    // alert("data is \"\"");
-                    // throw new retry.RetryError;
-                    debug("ajax function failed");
-                    retryer2.retry();
-                }
+                retryer2.retry();
             },
             error: function (a, b, c) {
                 throw new retry.RetryError("expected ajax failure");
             }});
 };
 retryer2 = new retry.Retryer({gave_up: gave_up2, interval: 200});
-// retryer2.go(ajax_will_fail);
+retryer2.go(ajax_will_fail);
 
 
 
