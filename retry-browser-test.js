@@ -60,7 +60,3 @@ retryer2 = new retry.Retryer({gave_up: gave_up2, interval: 200});
 retryer2.go(ajax_will_fail);
 
 
-
-
-debug("done with tests");
-
