@@ -1,5 +1,14 @@
 retry.js - (relatively) easy to use retrying with quadratic backoff
 
+Note:
+====
+
+This code predates and therefore doesn't take into account many
+useful advances made in Javascript in the past several years.
+
+It might be interesting to adapt but, honestly, I'd probably give it
+a miss if I were you.
+
 Whys and hows:
 =============
 
